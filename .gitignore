@@ -30,4 +30,11 @@ yarn-error.log*
 *.sln
 
 # local .env files
+.env
+.env.*
+!.env.example
 .env.local*
+
+# Agent-generated local skills and lock metadata
+.agents/
+skills-lock.json
