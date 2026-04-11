@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'auth',
-        component: () => import('pages/AuthForm.vue'),
+        component: () => import('pages/AuthPage.vue'),
         meta: { title: makePageTitle('Sign In') },
       },
       {
