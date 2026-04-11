@@ -1,7 +1,18 @@
 <script setup lang="ts">
+  import { useQuasar } from 'quasar';
   import { useUserStore } from 'src/stores/useUserStore';
 
+  const $q = useQuasar();
   const userStore = useUserStore();
+
+  function handleSave() {
+    if (!userStore.displayName.trim()) {
+      $q.notify({ type: 'negative', message: 'Display name cannot be empty.' });
+      return;
+    }
+    userStore.saveDisplayName();
+    $q.notify({ type: 'positive', message: 'Display name saved!' });
+  }
 </script>
 
 <template>
@@ -15,13 +26,14 @@
           label="Your Display Name"
           outlined
           dense
+          @keyup.enter="handleSave"
         />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn
           label="Save"
           color="primary"
-          @click="userStore.saveDisplayName"
+          @click="handleSave"
         />
       </q-card-actions>
     </q-card>

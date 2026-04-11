@@ -1,17 +1,30 @@
 <script setup lang="ts">
-  import { reactive } from 'vue';
+  import { reactive, ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useQuasar } from 'quasar';
+  import { useQuasar, date as qdate } from 'quasar';
   import { useSessionStore } from 'src/stores/useSessionStore';
 
   const $q = useQuasar();
   const router = useRouter();
   const sessionStore = useSessionStore();
 
+  const today = qdate.formatDate(Date.now(), 'YYYY/MM/DD');
+  const showDatePicker = ref(false);
+
   const form = reactive({
     title: '',
-    date: '',
+    date: today,
   });
+
+  function onDatePicked(value: string) {
+    form.date = value;
+    showDatePicker.value = false;
+  }
+
+  const displayDate = () => {
+    if (!form.date) return '';
+    return qdate.formatDate(new Date(form.date), 'MMMM D, YYYY');
+  };
 
   async function onSubmit() {
     if (!form.title || !form.date) {
@@ -20,7 +33,8 @@
     }
 
     try {
-      const session = await sessionStore.createSession(form.title, form.date);
+      const dateForDb = form.date.replace(/\//g, '-');
+      const session = await sessionStore.createSession(form.title, dateForDb);
       $q.notify({ type: 'positive', message: 'Session created!' });
       await router.push(`/sessions/${session.id}`);
     } catch (err) {
@@ -50,13 +64,34 @@
           />
 
           <q-input
-            v-model="form.date"
+            :model-value="displayDate()"
             label="Date"
-            type="date"
             outlined
             dense
-            :rules="[(val) => !!val || 'Date is required']"
-          />
+            readonly
+            :rules="[() => !!form.date || 'Date is required']"
+            @click="showDatePicker = true"
+          >
+            <template #prepend>
+              <q-icon
+                name="event"
+                class="cursor-pointer"
+                @click="showDatePicker = true"
+              />
+            </template>
+            <q-popup-proxy
+              v-model="showDatePicker"
+              transition-show="scale"
+              transition-hide="scale"
+            >
+              <q-date
+                :model-value="form.date"
+                mask="YYYY/MM/DD"
+                :options="(d: string) => d <= today"
+                @update:model-value="onDatePicked"
+              />
+            </q-popup-proxy>
+          </q-input>
 
           <q-btn
             label="Create Session"
