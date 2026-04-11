@@ -1,7 +1,25 @@
-[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}]
+root = true
+
+[*]
 charset = utf-8
-indent_size = 2
-indent_style = space
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+[*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}]
+indent_style = space
+indent_size = 2
+
+[*.{json,jsonc}]
+indent_style = space
+indent_size = 2
+
+[*.{scss,css}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
