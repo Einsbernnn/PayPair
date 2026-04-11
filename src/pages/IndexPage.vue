@@ -42,19 +42,12 @@
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
 
-export default {
-  setup () {
-    const rightDrawerOpen = ref(false)
+const rightDrawerOpen = ref(false)
 
-    return {
-      rightDrawerOpen,
-      toggleRightDrawer () {
-        rightDrawerOpen.value = !rightDrawerOpen.value
-      }
-    }
-  }
+function toggleRightDrawer() {
+  rightDrawerOpen.value = !rightDrawerOpen.value
 }
 </script>

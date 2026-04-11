@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useQuasar } from 'quasar'
+import { useAuthStore } from 'src/stores/useAuthStore'
 
 const $q = useQuasar()
+const authStore = useAuthStore()
 const form = reactive({
   email: '',
   password: '',
@@ -26,7 +28,7 @@ function onSubmit() {
   console.log('Submitted', { ...form })
 }
 
-function onProviderLogin(provider: 'Google' | 'GitHub') {
+function onProviderLogin(provider: 'GitHub') {
   $q.notify({
     message: provider,
     caption: `Login with ${provider}`,
@@ -79,11 +81,12 @@ function onProviderLogin(provider: 'Google' | 'GitHub') {
       <q-card-section class="row q-col-gutter-sm">
         <div class="col-6">
           <q-btn
-            label="Google"
-            outline
+            label="Sign in with Google"
             color="primary"
+            icon="img:https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             class="full-width"
-            @click="onProviderLogin('Google')"
+            :loading="authStore.loading"
+            @click="authStore.loginWithGoogle"
           />
         </div>
         <div class="col-6">

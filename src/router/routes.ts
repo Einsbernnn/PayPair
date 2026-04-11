@@ -8,6 +8,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: 'index', component: () => import('pages/IndexPage.vue'), meta: { title: makePageTitle() } },
       { path: 'auth', component: () => import('pages/AuthForm.vue'), meta: { title: makePageTitle('Auth') } },
+      { path: '/auth/callback', component: () => import('pages/AuthCallbackPage.vue'), meta: { title: makePageTitle('Callback') } },
     ],
   },
 
