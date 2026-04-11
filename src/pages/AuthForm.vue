@@ -1,41 +1,33 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { useQuasar } from 'quasar'
-import { useAuthStore } from 'src/stores/useAuthStore'
+  import { reactive } from 'vue'
+  import { useQuasar } from 'quasar'
+  import { useAuthStore } from 'src/stores/useAuthStore'
 
-const $q = useQuasar()
-const authStore = useAuthStore()
-const form = reactive({
-  email: '',
-  password: '',
-  remember: false
-})
+  const $q = useQuasar()
+  const authStore = useAuthStore()
+  const form = reactive({
+    email: '',
+    password: '',
+    remember: false,
+  })
 
-function onSubmit() {
-  if (!form.email || !form.password) {
+  function onSubmit() {
+    if (!form.email || !form.password) {
+      $q.notify({
+        type: 'negative',
+        message: 'Email and password are required.',
+      })
+      return
+    }
+
     $q.notify({
-      type: 'negative',
-      message: 'Email and password are required.'
+      type: 'positive',
+      message: 'Login form submitted.',
     })
-    return
+
+    console.log('Submitted', { ...form })
   }
 
-  $q.notify({
-    type: 'positive',
-    message: 'Login form submitted.'
-  })
-
-  console.log('Submitted', { ...form })
-}
-
-function onProviderLogin(provider: 'GitHub') {
-  $q.notify({
-    message: provider,
-    caption: `Login with ${provider}`,
-    color: 'primary',
-    position: 'top'
-  })
-}
 </script>
 
 <template>
@@ -47,7 +39,10 @@ function onProviderLogin(provider: 'GitHub') {
       </q-card-section>
 
       <q-card-section>
-        <q-form class="q-gutter-md" @submit.prevent="onSubmit">
+        <q-form
+          class="q-gutter-md"
+          @submit.prevent="onSubmit"
+        >
           <q-input
             v-model="form.email"
             label="Email"
@@ -67,12 +62,23 @@ function onProviderLogin(provider: 'GitHub') {
             outlined
             dense
             lazy-rules
-            :rules="[(val) => !!val || 'Password is required', (val) => val.length >= 8 || 'Must be at least 8 characters']"
+            :rules="[
+              (val) => !!val || 'Password is required',
+              (val) => val.length >= 8 || 'Must be at least 8 characters',
+            ]"
           />
 
-          <q-checkbox v-model="form.remember" label="Remember me" />
+          <q-checkbox
+            v-model="form.remember"
+            label="Remember me"
+          />
 
-          <q-btn label="Login" type="submit" color="primary" class="full-width" />
+          <q-btn
+            label="Login"
+            type="submit"
+            color="primary"
+            class="full-width"
+          />
         </q-form>
       </q-card-section>
 
@@ -91,15 +97,14 @@ function onProviderLogin(provider: 'GitHub') {
         </div>
         <div class="col-6">
           <q-btn
-            label="GitHub"
-            outline
+            label="Sign in with GitHub"
             color="dark"
-            class="full-width"
-            @click="onProviderLogin('GitHub')"
+            icon="img:https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            :loading="authStore.loading"
+            @click="authStore.loginWithGithub"
           />
         </div>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
-
