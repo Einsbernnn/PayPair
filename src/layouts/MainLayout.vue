@@ -2,9 +2,16 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
 
-        <q-toolbar-title> {{appName}} </q-toolbar-title>
+        <q-toolbar-title> {{ appName }} </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
@@ -17,13 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { APP_NAME } from '../constants/app';
+  import { ref } from 'vue';
+  import { APP_NAME } from '../constants/app';
 
-const appName = APP_NAME;
-const leftDrawerOpen = ref(false);
+  const appName = APP_NAME;
+  const leftDrawerOpen = ref(false);
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+  function toggleLeftDrawer() {
+    leftDrawerOpen.value = !leftDrawerOpen.value;
+  }
 </script>

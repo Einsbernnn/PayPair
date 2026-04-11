@@ -1,33 +1,32 @@
 <script setup lang="ts">
-  import { reactive } from 'vue'
-  import { useQuasar } from 'quasar'
-  import { useAuthStore } from 'src/stores/useAuthStore'
+  import { reactive } from 'vue';
+  import { useQuasar } from 'quasar';
+  import { useAuthStore } from 'src/stores/useAuthStore';
 
-  const $q = useQuasar()
-  const authStore = useAuthStore()
+  const $q = useQuasar();
+  const authStore = useAuthStore();
   const form = reactive({
     email: '',
     password: '',
     remember: false,
-  })
+  });
 
   function onSubmit() {
     if (!form.email || !form.password) {
       $q.notify({
         type: 'negative',
         message: 'Email and password are required.',
-      })
-      return
+      });
+      return;
     }
 
     $q.notify({
       type: 'positive',
       message: 'Login form submitted.',
-    })
+    });
 
-    console.log('Submitted', { ...form })
+    console.log('Submitted', { ...form });
   }
-
 </script>
 
 <template>

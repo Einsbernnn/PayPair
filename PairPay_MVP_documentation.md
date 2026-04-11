@@ -16,16 +16,16 @@ A lightweight web app that helps couples and groups:
 
 ## 🧱 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Vue 3 + TypeScript (Vite) |
-| UI Framework | Quasar Framework |
-| State Management | Pinia |
-| HTTP / Realtime | Supabase JS Client |
+| Layer                | Technology                 |
+| -------------------- | -------------------------- |
+| Frontend             | Vue 3 + TypeScript (Vite)  |
+| UI Framework         | Quasar Framework           |
+| State Management     | Pinia                      |
+| HTTP / Realtime      | Supabase JS Client         |
 | Backend (Serverless) | Supabase (Auth + API + DB) |
-| Database | PostgreSQL (via Supabase) |
-| Deployment | Vercel |
-| CI/CD | GitHub Actions |
+| Database             | PostgreSQL (via Supabase)  |
+| Deployment           | Vercel                     |
+| CI/CD                | GitHub Actions             |
 
 ---
 
@@ -55,49 +55,49 @@ A lightweight web app that helps couples and groups:
 
 ### `users`
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | UUID | Primary key, auto-generated |
-| `name` | TEXT | Display name |
-| `created_at` | TIMESTAMPTZ | Auto-set |
+| Column       | Type        | Notes                       |
+| ------------ | ----------- | --------------------------- |
+| `id`         | UUID        | Primary key, auto-generated |
+| `name`       | TEXT        | Display name                |
+| `created_at` | TIMESTAMPTZ | Auto-set                    |
 
 ### `sessions`
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | UUID | Primary key |
-| `title` | TEXT | e.g., "Dinner at Lusso" |
-| `date` | DATE | Date of the event |
-| `status` | TEXT | `active` or `settled` — default `active` |
-| `created_at` | TIMESTAMPTZ | Auto-set |
+| Column       | Type        | Notes                                    |
+| ------------ | ----------- | ---------------------------------------- |
+| `id`         | UUID        | Primary key                              |
+| `title`      | TEXT        | e.g., "Dinner at Lusso"                  |
+| `date`       | DATE        | Date of the event                        |
+| `status`     | TEXT        | `active` or `settled` — default `active` |
+| `created_at` | TIMESTAMPTZ | Auto-set                                 |
 
 ### `session_users`
 
-| Column | Type | Notes |
-|---|---|---|
+| Column       | Type | Notes            |
+| ------------ | ---- | ---------------- |
 | `session_id` | UUID | FK → sessions.id |
-| `user_id` | UUID | FK → users.id |
+| `user_id`    | UUID | FK → users.id    |
 
 ### `expenses`
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | UUID | Primary key |
-| `session_id` | UUID | FK → sessions.id |
-| `description` | TEXT | e.g., "Dinner", "Grab ride" |
-| `amount` | NUMERIC(10,2) | In PHP (₱) |
-| `paid_by` | UUID | FK → users.id |
-| `category` | TEXT | e.g., `food`, `transport`, `accommodation`, `other` — default `other` |
-| `created_at` | TIMESTAMPTZ | Auto-set |
+| Column        | Type          | Notes                                                                 |
+| ------------- | ------------- | --------------------------------------------------------------------- |
+| `id`          | UUID          | Primary key                                                           |
+| `session_id`  | UUID          | FK → sessions.id                                                      |
+| `description` | TEXT          | e.g., "Dinner", "Grab ride"                                           |
+| `amount`      | NUMERIC(10,2) | In PHP (₱)                                                            |
+| `paid_by`     | UUID          | FK → users.id                                                         |
+| `category`    | TEXT          | e.g., `food`, `transport`, `accommodation`, `other` — default `other` |
+| `created_at`  | TIMESTAMPTZ   | Auto-set                                                              |
 
 ### `splits`
 
-| Column | Type | Notes |
-|---|---|---|
-| `id` | UUID | Primary key |
-| `expense_id` | UUID | FK → expenses.id |
-| `user_id` | UUID | FK → users.id |
-| `amount` | NUMERIC(10,2) | Each person's share |
+| Column       | Type          | Notes               |
+| ------------ | ------------- | ------------------- |
+| `id`         | UUID          | Primary key         |
+| `expense_id` | UUID          | FK → expenses.id    |
+| `user_id`    | UUID          | FK → users.id       |
+| `amount`     | NUMERIC(10,2) | Each person's share |
 
 ### Relationships Diagram
 
@@ -141,7 +141,7 @@ users ──┬── session_users ──── sessions
 
 ---
 
-### 🔹 Phase 2 — Expense Logic *(CORE — highest priority)*
+### 🔹 Phase 2 — Expense Logic _(CORE — highest priority)_
 
 - [ ] Create `expenseService` — add expense, fetch by session
 - [ ] Add Zod schema for expense input validation:
@@ -168,7 +168,7 @@ export type ExpenseInput = z.infer<typeof ExpenseSchema>;
 
 export function calculateEqualSplits(
   amount: number,
-  participants: string[] // user IDs
+  participants: string[], // user IDs
 ): Record<string, number> {
   const share = parseFloat((amount / participants.length).toFixed(2));
   const splits: Record<string, number> = {};
@@ -209,10 +209,7 @@ export interface Balance {
   net: number; // positive = is owed money, negative = owes money
 }
 
-export function computeBalances(
-  expenses: Expense[],
-  splits: Split[]
-): Balance[] {
+export function computeBalances(expenses: Expense[], splits: Split[]): Balance[] {
   const balanceMap: Record<string, Balance> = {};
 
   // Sum what each person paid
@@ -232,9 +229,9 @@ export function computeBalances(
   }
 
   // Compute net
-  return Object.values(balanceMap).map(b => ({
+  return Object.values(balanceMap).map((b) => ({
     ...b,
-    net: parseFloat((b.paid - b.owed).toFixed(2))
+    net: parseFloat((b.paid - b.owed).toFixed(2)),
   }));
 }
 ```
@@ -246,7 +243,7 @@ export function computeBalances(
 
 export interface Transaction {
   from: string; // user ID who pays
-  to: string;   // user ID who receives
+  to: string; // user ID who receives
   amount: number;
 }
 
@@ -254,10 +251,11 @@ export function simplifyDebts(balances: Balance[]): Transaction[] {
   const transactions: Transaction[] = [];
 
   // Separate into creditors (net > 0) and debtors (net < 0)
-  const creditors = balances.filter(b => b.net > 0).map(b => ({ ...b }));
-  const debtors = balances.filter(b => b.net < 0).map(b => ({ ...b }));
+  const creditors = balances.filter((b) => b.net > 0).map((b) => ({ ...b }));
+  const debtors = balances.filter((b) => b.net < 0).map((b) => ({ ...b }));
 
-  let i = 0, j = 0;
+  let i = 0,
+    j = 0;
   while (i < debtors.length && j < creditors.length) {
     const debtor = debtors[i];
     const creditor = creditors[j];
@@ -290,10 +288,10 @@ export function simplifyDebts(balances: Balance[]): Transaction[] {
 
 **Pages:**
 
-| Route | Component | Purpose |
-|---|---|---|
-| `/` | `HomePage.vue` | List of all sessions (active + settled) |
-| `/sessions/:id` | `SessionPage.vue` | Expenses + balance summary |
+| Route           | Component         | Purpose                                 |
+| --------------- | ----------------- | --------------------------------------- |
+| `/`             | `HomePage.vue`    | List of all sessions (active + settled) |
+| `/sessions/:id` | `SessionPage.vue` | Expenses + balance summary              |
 
 **Components:**
 
@@ -306,6 +304,7 @@ export function simplifyDebts(balances: Balance[]): Transaction[] {
 - `ConfirmDialog.vue` — Uses `QDialog` with `QBtn` confirm/cancel actions
 
 **UI Requirements:**
+
 - [ ] Responsive layout using Quasar's grid system (`QLayout`, `QPage`, `QPageContainer`)
 - [ ] Mobile-first with Quasar breakpoints (`xs`, `sm`, `md`)
 - [ ] Currency formatted via `formatPHP()` utility — `₱1,234.50` everywhere
@@ -402,6 +401,7 @@ A web app for planning dates and tracking shared expenses.
 Built with Quasar + Vue 3 + Supabase.
 
 ## Prerequisites
+
 - Node.js 18+
 - Quasar CLI: `npm install -g @quasar/cli`
 - A Supabase account
@@ -417,20 +417,24 @@ Built with Quasar + Vue 3 + Supabase.
 
 3. Configure environment variables
    cp .env.example .env
+
    # Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 4. Run database migrations
+
    # Paste the SQL from /supabase/migrations/ into your Supabase SQL editor
 
 5. Start the dev server
    quasar dev
 
 ## Scripts
-- quasar dev        — Start local dev server
-- quasar build      — Production build
+
+- quasar dev — Start local dev server
+- quasar build — Production build
 - npm run type-check — TypeScript check
 
 ## Deployment
+
 Deployed on Vercel. Pushes to main trigger production deploys.
 ```
 
@@ -440,10 +444,10 @@ Deployed on Vercel. Pushes to main trigger production deploys.
 
 ### Branch Strategy
 
-| Branch | Purpose |
-|---|---|
-| `main` | Production — always stable |
-| `dev` | Integration — tested features merge here |
+| Branch      | Purpose                                  |
+| ----------- | ---------------------------------------- |
+| `main`      | Production — always stable               |
+| `dev`       | Integration — tested features merge here |
 | `feature/*` | Individual features, branched from `dev` |
 
 ### Example Feature Branches
@@ -510,9 +514,9 @@ Add the same two variables under **Project → Settings → Environment Variable
 
 ### Preview vs Production
 
-| Branch | Deployment |
-|---|---|
-| `dev` | Auto-deploys to **preview URL** |
+| Branch | Deployment                         |
+| ------ | ---------------------------------- |
+| `dev`  | Auto-deploys to **preview URL**    |
 | `main` | Auto-deploys to **production URL** |
 
 ---
@@ -568,15 +572,15 @@ jobs:
 
 These are intentionally deferred. Do not build until MVP is validated.
 
-| Feature | Priority | Notes |
-|---|---|---|
-| Supabase Auth (email/magic link) | High | Needed for real users |
-| Custom unequal splits | High | e.g., 60/40 instead of 50/50 |
-| Settlement / payment tracking | Medium | Mark debts as paid |
-| Share session via link | Medium | Invite participants easily |
-| Push notifications | Low | Remind people they owe money |
-| Spending analytics | Low | Trends, categories, totals |
-| PWA / offline support | Low | Works without internet |
+| Feature                          | Priority | Notes                        |
+| -------------------------------- | -------- | ---------------------------- |
+| Supabase Auth (email/magic link) | High     | Needed for real users        |
+| Custom unequal splits            | High     | e.g., 60/40 instead of 50/50 |
+| Settlement / payment tracking    | Medium   | Mark debts as paid           |
+| Share session via link           | Medium   | Invite participants easily   |
+| Push notifications               | Low      | Remind people they owe money |
+| Spending analytics               | Low      | Trends, categories, totals   |
+| PWA / offline support            | Low      | Works without internet       |
 
 ---
 
@@ -605,19 +609,19 @@ The MVP is **complete** when all of the following are true:
 
 The following 10 items were added to improve the MVP's quality, correctness, and developer experience:
 
-| # | Addition | Where Applied |
-|---|---|---|
-| 1 | **Session status field** (`active`/`settled`) | DB Schema → sessions, Phase 4 UI |
-| 2 | **Debt simplification algorithm** | Phase 3, `utils/debtSimplifier.ts` |
-| 3 | **Expense categories** (`food`, `transport`, etc.) | DB Schema → expenses, Phase 2 |
-| 4 | **Optimistic UI updates** via Pinia | Phase 4 UI requirements |
-| 5 | **`formatPHP()` currency utility** | `utils/currency.ts`, own section |
-| 6 | **Zod input validation** | Phase 2, `types/schemas.ts` |
-| 7 | **Confirmation before delete** | Phase 4, `ConfirmDialog.vue` |
-| 8 | **Shareable session link** | Phase 4, public `/sessions/:id` route |
-| 9 | **`EmptyState` + `LoadingSpinner` components** | Phase 4, `components/` |
-| 10 | **README with local setup instructions** | Phase 0, README template section |
+| #   | Addition                                           | Where Applied                         |
+| --- | -------------------------------------------------- | ------------------------------------- |
+| 1   | **Session status field** (`active`/`settled`)      | DB Schema → sessions, Phase 4 UI      |
+| 2   | **Debt simplification algorithm**                  | Phase 3, `utils/debtSimplifier.ts`    |
+| 3   | **Expense categories** (`food`, `transport`, etc.) | DB Schema → expenses, Phase 2         |
+| 4   | **Optimistic UI updates** via Pinia                | Phase 4 UI requirements               |
+| 5   | **`formatPHP()` currency utility**                 | `utils/currency.ts`, own section      |
+| 6   | **Zod input validation**                           | Phase 2, `types/schemas.ts`           |
+| 7   | **Confirmation before delete**                     | Phase 4, `ConfirmDialog.vue`          |
+| 8   | **Shareable session link**                         | Phase 4, public `/sessions/:id` route |
+| 9   | **`EmptyState` + `LoadingSpinner` components**     | Phase 4, `components/`                |
+| 10  | **README with local setup instructions**           | Phase 0, README template section      |
 
 ---
 
-*Last updated: April 2026*
+_Last updated: April 2026_

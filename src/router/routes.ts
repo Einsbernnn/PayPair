@@ -6,9 +6,21 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: 'index', component: () => import('pages/IndexPage.vue'), meta: { title: makePageTitle() } },
-      { path: 'auth', component: () => import('pages/AuthForm.vue'), meta: { title: makePageTitle('Auth') } },
-      { path: '/auth/callback', component: () => import('pages/AuthCallbackPage.vue'), meta: { title: makePageTitle('Callback') } },
+      {
+        path: 'index',
+        component: () => import('pages/IndexPage.vue'),
+        meta: { title: makePageTitle() },
+      },
+      {
+        path: 'auth',
+        component: () => import('pages/AuthForm.vue'),
+        meta: { title: makePageTitle('Auth') },
+      },
+      {
+        path: '/auth/callback',
+        component: () => import('pages/AuthCallbackPage.vue'),
+        meta: { title: makePageTitle('Callback') },
+      },
     ],
   },
 

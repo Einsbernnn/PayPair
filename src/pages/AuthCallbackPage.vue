@@ -1,15 +1,15 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { supabase } from 'src/services/supabase'
+  import { onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { supabase } from 'src/services/supabase';
 
-  const router = useRouter()
+  const router = useRouter();
 
   onMounted(async () => {
-    const { error } = await supabase.auth.getSession()
-    if (error) console.error('Auth callback error:', error.message)
-    await router.push('/')
-  })
+    const { error } = await supabase.auth.getSession();
+    if (error) console.error('Auth callback error:', error.message);
+    await router.push('/');
+  });
 </script>
 
 <template>
