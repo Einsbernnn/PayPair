@@ -7,25 +7,43 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: 'index',
+        path: '',
         component: () => import('pages/IndexPage.vue'),
         meta: { title: makePageTitle() },
       },
       {
-        path: 'auth',
-        component: () => import('pages/AuthForm.vue'),
-        meta: { title: makePageTitle('Auth') },
+        path: 'sessions',
+        component: () => import('pages/HomePage.vue'),
+        meta: { title: makePageTitle('Sessions') },
       },
       {
-        path: '/auth/callback',
+        path: 'sessions/new',
+        component: () => import('pages/NewSessionPage.vue'),
+        meta: { title: makePageTitle('New Session') },
+      },
+      {
+        path: 'sessions/:id',
+        component: () => import('pages/SessionPage.vue'),
+        meta: { title: makePageTitle('Session') },
+      },
+      {
+        path: 'settings',
+        component: () => import('pages/SettingsPage.vue'),
+        meta: { title: makePageTitle('Settings') },
+      },
+      {
+        path: 'auth',
+        component: () => import('pages/AuthForm.vue'),
+        meta: { title: makePageTitle('Sign In') },
+      },
+      {
+        path: 'auth/callback',
         component: () => import('pages/AuthCallbackPage.vue'),
         meta: { title: makePageTitle('Callback') },
       },
     ],
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),

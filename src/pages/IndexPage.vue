@@ -1,78 +1,43 @@
-<template>
-  <q-layout view="hHr lpR ffr">
-    <q-header
-      elevated
-      class="bg-primary text-white"
-      height-hint="98"
-    >
-      <q-toolbar>
-        <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
-          </q-avatar>
-          Title
-        </q-toolbar-title>
-
-        <q-btn
-          dense
-          flat
-          round
-          icon="menu"
-          @click="toggleRightDrawer"
-        />
-      </q-toolbar>
-
-      <q-tabs align="left">
-        <q-route-tab
-          to="/page1"
-          label="Page One"
-        />
-        <q-route-tab
-          to="/page2"
-          label="Page Two"
-        />
-        <q-route-tab
-          to="/page3"
-          label="Page Three"
-        />
-      </q-tabs>
-    </q-header>
-
-    <q-drawer
-      show-if-above
-      v-model="rightDrawerOpen"
-      side="right"
-      bordered
-    >
-      <!-- drawer content -->
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-
-    <q-footer
-      elevated
-      class="bg-grey-8 text-white"
-    >
-      <q-toolbar>
-        <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
-          </q-avatar>
-          <div>Title</div>
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-footer>
-  </q-layout>
-</template>
-
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { useAuthStore } from 'src/stores/useAuthStore';
 
-  const rightDrawerOpen = ref(false);
-
-  function toggleRightDrawer() {
-    rightDrawerOpen.value = !rightDrawerOpen.value;
-  }
+  const authStore = useAuthStore();
 </script>
+
+<template>
+  <q-page padding>
+    <div
+      v-if="authStore.isLoggedIn"
+      class="q-gutter-md"
+    >
+      <div class="text-h5">Welcome, {{ authStore.user?.email }}</div>
+      <p class="text-body1 text-grey-7">You're signed in. Use the tabs below to manage sessions.</p>
+      <q-btn
+        label="Sign Out"
+        color="negative"
+        outline
+        @click="authStore.logout"
+      />
+    </div>
+
+    <div
+      v-else
+      class="flex flex-center column q-pa-xl q-gutter-md"
+    >
+      <q-icon
+        name="account_balance_wallet"
+        size="64px"
+        color="primary"
+      />
+      <div class="text-h5 text-center">Welcome to PairPay</div>
+      <p class="text-body1 text-grey-7 text-center">
+        Plan your dates, split the costs, and keep things fair.
+      </p>
+      <q-btn
+        label="Sign In"
+        color="primary"
+        to="/auth"
+      />
+    </div>
+  </q-page>
+</template>
