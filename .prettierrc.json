@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/prettierrc",
-  "semi": false,
+  "semi": true,
   "singleQuote": true,
   "quoteProps": "as-needed",
   "trailingComma": "all",
@@ -12,6 +12,6 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "vueIndentScriptAndStyle": true,
-  "htmlWhitespaceSensitivity": "condense",
+  "htmlWhitespaceSensitivity": "css",
   "singleAttributePerLine": true
 }
