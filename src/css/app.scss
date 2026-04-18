@@ -1,1 +1,696 @@
-// app global css
+// ─────────────────────────────────────────────────────────────
+// PairPay — Paper Ledger aesthetic
+// Editorial, serif-led, tactile. Warm cream paper + deep ink.
+// ─────────────────────────────────────────────────────────────
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  // Palette
+  --paper: #f5efe4;
+  --paper-deep: #ece4d4;
+  --paper-edge: #e2d8c2;
+  --ink: #1c1410;
+  --ink-soft: #3a2e27;
+  --ink-mute: #6b5d51;
+  --rouge: #a5321e;
+  --rouge-deep: #7d2112;
+  --sage: #6b7556;
+  --sage-soft: #8b9475;
+  --dust: #b8a894;
+  --peach: #e8cba8;
+  --gold: #c89c4d;
+
+  // Type
+  --font-serif:
+    'Fraunces', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --font-sans: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  // Elevation (paper-soft, not Material-crisp)
+  --shadow-paper:
+    0 1px 0 rgba(28, 20, 16, 0.04), 0 6px 18px -10px rgba(28, 20, 16, 0.18),
+    0 20px 40px -24px rgba(28, 20, 16, 0.12);
+  --shadow-card: 0 1px 0 rgba(28, 20, 16, 0.03), 0 14px 28px -18px rgba(28, 20, 16, 0.14);
+
+  // Motion
+  --ease-ink: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Base / body
+// ─────────────────────────────────────────────────────────────
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings:
+    'ss01' on,
+    'cv11' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body.body--light,
+.q-page-container {
+  background: var(--paper);
+}
+
+// Subtle paper grain — SVG noise over the whole page
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.q-layout,
+.q-page,
+.q-page-container {
+  position: relative;
+  z-index: 1;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Typography primitives
+// ─────────────────────────────────────────────────────────────
+.font-serif {
+  font-family: var(--font-serif);
+}
+.font-sans {
+  font-family: var(--font-sans);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.display-xl {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 40;
+}
+
+.display-lg {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 6.5vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 30;
+}
+
+.display-md {
+  font-family: var(--font-serif);
+  font-weight: 450;
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-variation-settings:
+    'opsz' 96,
+    'SOFT' 20;
+}
+
+.money {
+  font-family: var(--font-serif);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1,
+    'ss01' 1;
+  font-variation-settings:
+    'opsz' 120,
+    'SOFT' 10;
+  letter-spacing: -0.01em;
+}
+
+.money-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.small-caps {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rouge);
+
+  &::before {
+    content: '';
+    width: 1.25rem;
+    height: 1px;
+    background: currentColor;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Dotted rule — Monocle-style separator
+// ─────────────────────────────────────────────────────────────
+.dotted-rule {
+  background-image: radial-gradient(circle, var(--dust) 1px, transparent 1.25px);
+  background-size: 8px 2px;
+  background-repeat: repeat-x;
+  background-position: left center;
+  height: 2px;
+  border: 0;
+  width: 100%;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Paper card — base for most surface elements
+// ─────────────────────────────────────────────────────────────
+.paper-card {
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 260ms var(--ease-ink),
+    box-shadow 260ms var(--ease-ink);
+}
+
+.paper-card--raised {
+  box-shadow: var(--shadow-paper);
+}
+
+// Receipt card — perforated top edge
+.receipt-card {
+  position: relative;
+  background: var(--paper-deep);
+  border: 1px solid var(--paper-edge);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 1.25rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background:
+      radial-gradient(circle at 6px 10px, transparent 5px, var(--paper-deep) 5.5px) left top /
+        12px 10px repeat-x;
+    filter: drop-shadow(0 1px 0 var(--paper-edge));
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Quasar component overrides
+// ─────────────────────────────────────────────────────────────
+// Header / toolbar — editorial, quiet
+.q-header {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: none;
+  border-bottom: 1px solid var(--paper-edge);
+}
+
+.q-toolbar {
+  min-height: 62px;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.q-toolbar__title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  font-size: 1.35rem;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 30;
+}
+
+// Footer tabs — no bright primary bar, use paper
+.q-footer {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: none;
+  border-top: 1px solid var(--paper-edge);
+}
+
+.q-tabs.pp-tabs {
+  background: transparent;
+  color: var(--ink-mute);
+
+  .q-tab {
+    min-height: 62px;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    padding: 4px 0;
+
+    .q-tab__icon {
+      font-size: 22px;
+    }
+  }
+
+  .q-tab--active {
+    color: var(--rouge);
+
+    .q-tab__label {
+      font-weight: 600;
+    }
+  }
+
+  .q-tab__indicator {
+    height: 2px;
+    background: var(--rouge);
+    border-radius: 2px;
+  }
+}
+
+// Cards — replace Material elevation with paper-soft
+.q-card {
+  background: var(--paper-deep);
+  color: var(--ink);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.q-card--flat,
+.q-card.q-card--flat {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.q-card__section--vert {
+  padding: 1.25rem;
+}
+
+// Inputs — hairline ink border, generous label, editorial
+.q-field__control {
+  border-radius: 10px;
+  min-height: 48px;
+}
+
+.q-field--outlined .q-field__control {
+  background: var(--paper);
+  padding: 0 14px;
+
+  &::before {
+    border-color: var(--paper-edge);
+    border-width: 1px;
+    transition: border-color 200ms var(--ease-ink);
+  }
+
+  &:hover::before {
+    border-color: var(--dust);
+  }
+}
+
+.q-field--outlined.q-field--focused .q-field__control::before {
+  border-width: 1.5px;
+  border-color: var(--ink);
+}
+
+.q-field__label {
+  font-family: var(--font-sans);
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+}
+
+.q-field--focused .q-field__label,
+.q-field--float .q-field__label {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.q-field__native,
+.q-field__prefix,
+.q-field__suffix {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+}
+
+.q-field__hint,
+.q-field__messages {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--ink-mute);
+}
+
+.q-field--error .q-field__control::before {
+  border-color: var(--rouge) !important;
+}
+.q-field--error .q-field__label {
+  color: var(--rouge);
+}
+
+// Buttons — editorial, not round-pilled
+.q-btn {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  border-radius: 10px;
+  padding: 0.7rem 1.25rem;
+  min-height: 0;
+  transition:
+    transform 160ms var(--ease-ink),
+    box-shadow 200ms var(--ease-ink),
+    background 200ms var(--ease-ink);
+
+  .q-btn__content {
+    gap: 0.5rem;
+  }
+
+  &:not(.q-btn--flat):not(.q-btn--outline):not(.disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -12px rgba(165, 50, 30, 0.4);
+  }
+
+  &.q-btn--round,
+  &.q-btn--dense {
+    padding: 0.45rem 0.7rem;
+  }
+
+  &.q-btn--round {
+    border-radius: 50%;
+  }
+}
+
+.q-btn--unelevated,
+.q-btn:not(.q-btn--flat):not(.q-btn--outline) {
+  box-shadow: 0 1px 0 rgba(28, 20, 16, 0.1);
+}
+
+.q-btn.q-btn--flat {
+  color: var(--ink);
+
+  &:hover {
+    background: rgba(28, 20, 16, 0.06);
+  }
+}
+
+.q-btn.bg-primary,
+.q-btn.text-primary {
+  // keep Quasar semantics
+}
+
+// Primary button — rouge, on paper
+.q-btn--unelevated.bg-primary,
+.q-btn.bg-primary {
+  background: var(--rouge);
+  color: var(--paper);
+
+  &:hover:not(.disabled) {
+    background: var(--rouge-deep);
+  }
+}
+
+// Secondary — sage
+.q-btn.bg-secondary {
+  background: var(--sage);
+  color: var(--paper);
+
+  &:hover:not(.disabled) {
+    background: #5c6649;
+  }
+}
+
+// Dark button — deep ink
+.q-btn.bg-dark {
+  background: var(--ink);
+  color: var(--paper);
+
+  &:hover:not(.disabled) {
+    background: #2a1f18;
+  }
+}
+
+// Ghost / outline button helper class
+.btn-ghost {
+  background: transparent !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--paper-edge) !important;
+  box-shadow: none !important;
+
+  &:hover:not(.disabled) {
+    background: var(--paper-deep) !important;
+    border-color: var(--dust) !important;
+  }
+}
+
+// Disabled state
+.q-btn.disabled,
+.q-btn[disabled] {
+  opacity: 0.45;
+}
+
+// Badges — editorial label
+.q-badge {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.q-badge.bg-green,
+.q-badge.bg-positive {
+  background: rgba(107, 117, 86, 0.14);
+  color: var(--sage);
+  border-color: rgba(107, 117, 86, 0.3);
+}
+
+.q-badge.bg-grey {
+  background: rgba(184, 168, 148, 0.2);
+  color: var(--ink-mute);
+  border-color: rgba(184, 168, 148, 0.4);
+}
+
+// Lists — strip heavy borders, use hairline
+.q-list--bordered {
+  border: 1px solid var(--paper-edge);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.q-list--separator > .q-item + .q-item,
+.q-item + .q-separator,
+.q-separator {
+  background: var(--paper-edge);
+}
+
+.q-item {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 56px;
+  padding: 12px 16px;
+
+  &:hover {
+    background: rgba(232, 203, 168, 0.15);
+  }
+}
+
+.q-item__label {
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.q-item__label--caption {
+  color: var(--ink-mute);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+// Dialogs
+.q-dialog__inner > .q-card {
+  background: var(--paper-deep);
+  border-radius: 16px;
+  border: 1px solid var(--paper-edge);
+  box-shadow: var(--shadow-paper);
+}
+
+.q-dialog__backdrop {
+  background: rgba(28, 20, 16, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+// Notify / toasts
+.q-notification {
+  font-family: var(--font-sans);
+  border-radius: 12px;
+  border: 1px solid var(--paper-edge);
+  box-shadow: var(--shadow-paper);
+}
+
+.q-notification--standard.bg-positive {
+  background: var(--sage) !important;
+  color: var(--paper) !important;
+}
+
+.q-notification--standard.bg-negative {
+  background: var(--rouge-deep) !important;
+  color: var(--paper) !important;
+}
+
+// Spinner
+.q-spinner {
+  color: var(--rouge);
+}
+
+// Date picker
+.q-date {
+  background: var(--paper-deep);
+  color: var(--ink);
+  border-radius: 14px;
+  border: 1px solid var(--paper-edge);
+  font-family: var(--font-sans);
+}
+
+.q-date__header {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-serif);
+}
+
+.q-date__today {
+  box-shadow: 0 0 0 1px var(--rouge);
+}
+
+.q-date__calendar-item--in button.q-btn:not(.disabled) .q-btn__content {
+  color: var(--ink);
+}
+
+.q-date__calendar-item > button.bg-primary {
+  background: var(--rouge) !important;
+  color: var(--paper) !important;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Utilities & motion
+// ─────────────────────────────────────────────────────────────
+.text-ink {
+  color: var(--ink);
+}
+.text-ink-soft {
+  color: var(--ink-soft);
+}
+.text-ink-mute {
+  color: var(--ink-mute);
+}
+.text-rouge {
+  color: var(--rouge);
+}
+.text-sage {
+  color: var(--sage);
+}
+.bg-paper {
+  background: var(--paper);
+}
+.bg-paper-deep {
+  background: var(--paper-deep);
+}
+
+// Stagger reveal
+@keyframes pp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pp-rise {
+  animation: pp-rise 520ms var(--ease-ink) both;
+}
+
+@for $i from 1 through 12 {
+  .pp-rise-#{$i} {
+    animation: pp-rise 520ms var(--ease-ink) both;
+    animation-delay: #{$i * 60}ms;
+  }
+}
+
+// Ink-stamp reveal (for "settled" badge)
+@keyframes pp-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-5deg);
+  }
+  100% {
+    opacity: 0.92;
+    transform: scale(1) rotate(-4deg);
+  }
+}
+
+.pp-stamp {
+  animation: pp-stamp 480ms var(--ease-ink) both;
+}
+
+// Page transitions
+.q-page {
+  animation: pp-rise 420ms var(--ease-ink) both;
+}
+
+// Scrollbar
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--paper-edge);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--dust);
+}
+
+// Selection
+::selection {
+  background: var(--peach);
+  color: var(--ink);
+}
