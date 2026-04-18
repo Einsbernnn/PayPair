@@ -7,15 +7,52 @@ import { signInWithGoogle, signInWithGithub, signOut } from 'src/services/auth';
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
   const loading = ref(false);
+  const initialized = ref(false);
 
-  async function init() {
-    const { data } = await supabase.auth.getSession();
-    user.value = data.session?.user ?? null;
+  let initPromise: Promise<void> | null = null;
 
-    // Keep user in sync when session changes
-    supabase.auth.onAuthStateChange((_event, session) => {
-      user.value = session?.user ?? null;
+  function init() {
+    // Only run init once; return the same promise if called again
+    if (initPromise) return initPromise;
+
+    initPromise = new Promise<void>((resolve) => {
+      console.log('[AuthStore] init: setting up onAuthStateChange listener');
+      supabase.auth.onAuthStateChange((event, session) => {
+        console.log(
+          '[AuthStore] onAuthStateChange event:',
+          event,
+          'session:',
+          !!session,
+          'user:',
+          session?.user?.email ?? 'null',
+        );
+        user.value = session?.user ?? null;
+
+        // INITIAL_SESSION fires after Supabase finishes processing URL tokens
+        if (event === 'INITIAL_SESSION') {
+          console.log(
+            '[AuthStore] INITIAL_SESSION received, user:',
+            session?.user?.email ?? 'null',
+          );
+          initialized.value = true;
+          resolve();
+        }
+      });
+
+      // Safety timeout so the app doesn't hang if the event never fires
+      setTimeout(() => {
+        console.log(
+          '[AuthStore] init timeout reached, initialized:',
+          initialized.value,
+          'user:',
+          user.value?.email ?? 'null',
+        );
+        initialized.value = true;
+        resolve();
+      }, 5000);
     });
+
+    return initPromise;
   }
 
   async function loginWithGoogle() {
@@ -48,5 +85,5 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLoggedIn = computed(() => !!user.value);
 
-  return { user, loading, isLoggedIn, init, loginWithGoogle, loginWithGithub, logout };
+  return { user, loading, initialized, isLoggedIn, init, loginWithGoogle, loginWithGithub, logout };
 });

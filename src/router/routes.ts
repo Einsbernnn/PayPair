@@ -34,12 +34,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'auth',
         component: () => import('pages/AuthPage.vue'),
-        meta: { title: makePageTitle('Sign In') },
+        meta: { title: makePageTitle('Sign In'), public: true },
       },
       {
         path: 'auth/callback',
         component: () => import('pages/AuthCallbackPage.vue'),
-        meta: { title: makePageTitle('Callback') },
+        meta: { title: makePageTitle('Callback'), public: true },
       },
     ],
   },

@@ -6,38 +6,24 @@
 
 <template>
   <q-page padding>
-    <div
-      v-if="authStore.isLoggedIn"
-      class="q-gutter-md"
-    >
+    <div class="q-gutter-md">
       <div class="text-h5">Welcome, {{ authStore.user?.email }}</div>
       <p class="text-body1 text-grey-7">You're signed in. Use the tabs below to manage sessions.</p>
-      <q-btn
-        label="Sign Out"
-        color="negative"
-        outline
-        @click="authStore.logout"
-      />
-    </div>
 
-    <div
-      v-else
-      class="flex flex-center column q-pa-xl q-gutter-md"
-    >
-      <q-icon
-        name="account_balance_wallet"
-        size="64px"
-        color="primary"
-      />
-      <div class="text-h5 text-center">Welcome to PairPay</div>
-      <p class="text-body1 text-grey-7 text-center">
-        Plan your dates, split the costs, and keep things fair.
-      </p>
-      <q-btn
-        label="Sign In"
-        color="primary"
-        to="/auth"
-      />
+      <div class="row q-gutter-sm">
+        <q-btn
+          label="Go to Sessions"
+          color="primary"
+          icon="receipt_long"
+          to="/sessions"
+        />
+        <q-btn
+          label="New Session"
+          color="secondary"
+          icon="add_circle"
+          to="/sessions/new"
+        />
+      </div>
     </div>
   </q-page>
 </template>

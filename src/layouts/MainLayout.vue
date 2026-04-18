@@ -9,13 +9,8 @@
           dense
           round
           icon="logout"
-          @click="authStore.logout"
-        />
-        <q-btn
-          v-else
-          flat
-          label="Sign In"
-          to="/auth"
+          :loading="authStore.loading"
+          @click="handleLogout"
         />
       </q-toolbar>
     </q-header>
@@ -24,7 +19,10 @@
       <router-view />
     </q-page-container>
 
-    <q-footer elevated>
+    <q-footer
+      v-if="!isAuthPage"
+      elevated
+    >
       <q-tabs
         v-model="activeTab"
         class="bg-primary text-white"
@@ -63,11 +61,21 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { APP_NAME } from '../constants/app';
   import { useAuthStore } from 'src/stores/useAuthStore';
 
   const appName = APP_NAME;
   const activeTab = ref('home');
   const authStore = useAuthStore();
+  const route = useRoute();
+  const router = useRouter();
+
+  const isAuthPage = computed(() => route.path.startsWith('/auth'));
+
+  async function handleLogout() {
+    await authStore.logout();
+    await router.push('/auth');
+  }
 </script>

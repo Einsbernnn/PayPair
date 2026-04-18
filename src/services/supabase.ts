@@ -7,4 +7,9 @@ if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error('Missing Supabase env vars: VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY');
 }
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey);
+export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
+  auth: {
+    flowType: 'pkce',
+    detectSessionInUrl: true,
+  },
+});
