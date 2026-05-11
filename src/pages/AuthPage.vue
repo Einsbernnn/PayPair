@@ -1,7 +1,60 @@
 <script setup lang="ts">
+  import { ref } from 'vue';
+  import { useRouter, useRoute } from 'vue-router';
   import { useAuthStore } from 'src/stores/useAuthStore';
 
   const authStore = useAuthStore();
+  const router = useRouter();
+  const route = useRoute();
+
+  type Mode = 'signin' | 'register';
+  const mode = ref<Mode>('signin');
+
+  const fullName = ref('');
+  const email = ref('');
+  const password = ref('');
+  const showPassword = ref(false);
+
+  const formError = ref('');
+  const confirmationSent = ref(false);
+
+  const emailRules = [
+    (v: string) => !!v || 'Email is required',
+    (v: string) => /^\S+@\S+\.\S+$/.test(v) || 'Enter a valid email address',
+  ];
+  const passwordRules = [
+    (v: string) => !!v || 'Password is required',
+    (v: string) => v.length >= 6 || 'At least 6 characters',
+  ];
+  const nameRules = [(v: string) => !!v || 'Please tell us what to call you'];
+
+  function switchMode(next: Mode) {
+    if (mode.value === next) return;
+    mode.value = next;
+    formError.value = '';
+    confirmationSent.value = false;
+  }
+
+  async function onSubmit() {
+    formError.value = '';
+    try {
+      if (mode.value === 'register') {
+        const data = await authStore.registerWithEmail(email.value, password.value, fullName.value);
+        if (data.session) {
+          const redirect = (route.query.redirect as string) || '/sessions';
+          await router.push(redirect);
+        } else {
+          confirmationSent.value = true;
+        }
+      } else {
+        await authStore.loginWithEmail(email.value, password.value);
+        const redirect = (route.query.redirect as string) || '/sessions';
+        await router.push(redirect);
+      }
+    } catch (err) {
+      formError.value = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+    }
+  }
 </script>
 
 <template>
@@ -11,7 +64,7 @@
       <section class="pp-auth__hero">
         <div class="pp-auth__folio">Nº 01 · 2026</div>
 
-        <div class="eyebrow">PairPay · Sign in</div>
+        <div class="eyebrow">PairPay · {{ mode === 'register' ? 'Register' : 'Sign in' }}</div>
 
         <h1 class="pp-auth__title display-xl">
           Keep the <em>receipts</em><br />
@@ -37,14 +90,147 @@
         </div>
       </section>
 
-      <!-- Sign-in card -->
+      <!-- Auth card -->
       <aside class="pp-auth__card paper-card paper-card--raised">
         <div class="pp-auth__card-head">
-          <div class="eyebrow" style="color: var(--ink-mute)">Welcome</div>
-          <h2 class="display-md pp-auth__card-title">Sign in to continue</h2>
+          <div
+            class="eyebrow"
+            style="color: var(--ink-mute)"
+          >
+            {{ mode === 'register' ? 'New here' : 'Welcome' }}
+          </div>
+          <h2 class="display-md pp-auth__card-title">
+            {{ mode === 'register' ? 'Open a new ledger' : 'Sign in to continue' }}
+          </h2>
           <p class="pp-auth__card-sub">
-            Choose a sign-in method below. We'll remember you on this device.
+            {{
+              mode === 'register'
+                ? 'A fresh account, just for you and yours.'
+                : "We'll remember you on this device."
+            }}
           </p>
+        </div>
+
+        <!-- Mode toggle -->
+        <div
+          class="pp-auth__tabs"
+          role="tablist"
+          aria-label="Authentication mode"
+        >
+          <button
+            type="button"
+            role="tab"
+            :aria-selected="mode === 'signin'"
+            :class="['pp-auth__tab', { 'pp-auth__tab--active': mode === 'signin' }]"
+            @click="switchMode('signin')"
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            role="tab"
+            :aria-selected="mode === 'register'"
+            :class="['pp-auth__tab', { 'pp-auth__tab--active': mode === 'register' }]"
+            @click="switchMode('register')"
+          >
+            Register
+          </button>
+        </div>
+
+        <!-- Confirmation notice (after register w/ email confirmation on) -->
+        <div
+          v-if="confirmationSent"
+          class="pp-auth__notice"
+        >
+          <div class="small-caps pp-auth__notice-eyebrow">Check your inbox</div>
+          <p>
+            We've sent a confirmation link to <strong>{{ email }}</strong
+            >. Click it to finish opening your ledger.
+          </p>
+          <q-btn
+            flat
+            no-caps
+            label="Back to sign in"
+            class="pp-auth__notice-back"
+            @click="
+              () => {
+                confirmationSent = false;
+                switchMode('signin');
+              }
+            "
+          />
+        </div>
+
+        <!-- Form -->
+        <q-form
+          v-else
+          class="pp-auth__form"
+          greedy
+          @submit.prevent="onSubmit"
+        >
+          <q-input
+            v-if="mode === 'register'"
+            v-model="fullName"
+            outlined
+            label="Your name"
+            autocomplete="name"
+            :rules="nameRules"
+            lazy-rules
+          />
+
+          <q-input
+            v-model="email"
+            outlined
+            type="email"
+            label="Email"
+            autocomplete="email"
+            :rules="emailRules"
+            lazy-rules
+          />
+
+          <q-input
+            v-model="password"
+            outlined
+            :type="showPassword ? 'text' : 'password'"
+            label="Password"
+            :autocomplete="mode === 'register' ? 'new-password' : 'current-password'"
+            :rules="passwordRules"
+            lazy-rules
+            :hint="mode === 'register' ? 'At least 6 characters.' : undefined"
+          >
+            <template #append>
+              <q-icon
+                :name="showPassword ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer pp-auth__pw-toggle"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </q-input>
+
+          <div
+            v-if="formError"
+            class="pp-auth__error"
+            role="alert"
+          >
+            {{ formError }}
+          </div>
+
+          <q-btn
+            type="submit"
+            unelevated
+            no-caps
+            color="primary"
+            :label="mode === 'register' ? 'Create account' : 'Sign in'"
+            :loading="authStore.loading"
+            class="pp-auth__submit"
+          />
+        </q-form>
+
+        <div
+          class="pp-auth__divider"
+          aria-hidden="true"
+        >
+          <span>or continue with</span>
         </div>
 
         <div class="pp-auth__providers">
@@ -110,7 +296,8 @@
         </div>
 
         <div class="pp-auth__fine">
-          By signing in, you agree to let PairPay store your session data. Your receipts are yours.
+          By {{ mode === 'register' ? 'creating an account' : 'signing in' }}, you agree to let
+          PairPay store your session data. Your receipts are yours.
         </div>
       </aside>
     </div>
@@ -242,10 +429,146 @@
   }
 
   .pp-auth__card-sub {
-    margin: 0 0 1.5rem;
+    margin: 0 0 1.25rem;
     color: var(--ink-mute);
     font-size: 0.95rem;
     line-height: 1.5;
+  }
+
+  .pp-auth__tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--paper-deep);
+    border: 1px solid var(--paper-edge);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .pp-auth__tab {
+    appearance: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.6rem 0.5rem;
+    border-radius: 9px;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    transition:
+      background 200ms var(--ease-ink),
+      color 200ms var(--ease-ink),
+      box-shadow 200ms var(--ease-ink);
+
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  .pp-auth__tab--active {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(28, 20, 16, 0.08);
+  }
+
+  .pp-auth__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .pp-auth__pw-toggle {
+    color: var(--ink-mute);
+    transition: color 160ms var(--ease-ink);
+
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  .pp-auth__error {
+    margin-top: 0.25rem;
+    padding: 0.65rem 0.85rem;
+    background: rgba(165, 50, 30, 0.08);
+    border-left: 3px solid var(--rouge);
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+    color: var(--rouge);
+    line-height: 1.45;
+  }
+
+  :deep(.pp-auth__submit) {
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-size: 0.96rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .pp-auth__notice {
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 0.25rem;
+    background: var(--paper-deep);
+    border: 1px dashed var(--paper-edge);
+    border-radius: 12px;
+    text-align: center;
+
+    p {
+      margin: 0.4rem 0 0.85rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      font-variation-settings:
+        'opsz' 18,
+        'SOFT' 40;
+
+      strong {
+        font-style: normal;
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+        color: var(--ink);
+      }
+    }
+  }
+
+  .pp-auth__notice-eyebrow {
+    color: var(--rouge);
+  }
+
+  :deep(.pp-auth__notice-back) {
+    color: var(--ink-mute);
+    font-size: 0.85rem;
+  }
+
+  .pp-auth__divider {
+    display: flex;
+    align-items: center;
+    margin: 1.25rem 0;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-top: 1px dashed var(--paper-edge);
+    }
+
+    span {
+      margin: 0 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
   }
 
   .pp-auth__providers {

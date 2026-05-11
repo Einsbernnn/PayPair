@@ -36,3 +36,19 @@ export async function signInWithGithub() {
 
   if (error) throw new Error(error.message);
 }
+
+export async function signUpWithPassword(email: string, password: string, fullName?: string) {
+  const emailRedirectTo = `${window.location.origin}${import.meta.env.BASE_URL}auth/callback`;
+  const options = fullName
+    ? { emailRedirectTo, data: { full_name: fullName } }
+    : { emailRedirectTo };
+  const { data, error } = await supabase.auth.signUp({ email, password, options });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function signInWithPassword(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw new Error(error.message);
+  return data;
+}

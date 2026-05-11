@@ -2,7 +2,13 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from 'src/services/supabase';
-import { signInWithGoogle, signInWithGithub, signOut } from 'src/services/auth';
+import {
+  signInWithGoogle,
+  signInWithGithub,
+  signOut,
+  signUpWithPassword,
+  signInWithPassword,
+} from 'src/services/auth';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
@@ -73,6 +79,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function registerWithEmail(email: string, password: string, fullName?: string) {
+    loading.value = true;
+    try {
+      return await signUpWithPassword(email, password, fullName);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function loginWithEmail(email: string, password: string) {
+    loading.value = true;
+    try {
+      return await signInWithPassword(email, password);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function logout() {
     loading.value = true;
     try {
@@ -85,5 +109,16 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLoggedIn = computed(() => !!user.value);
 
-  return { user, loading, initialized, isLoggedIn, init, loginWithGoogle, loginWithGithub, logout };
+  return {
+    user,
+    loading,
+    initialized,
+    isLoggedIn,
+    init,
+    loginWithGoogle,
+    loginWithGithub,
+    registerWithEmail,
+    loginWithEmail,
+    logout,
+  };
 });
