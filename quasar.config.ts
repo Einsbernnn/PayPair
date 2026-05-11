@@ -44,7 +44,7 @@ export default defineConfig((/* ctx */) => {
       },
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
-      vueRouterBase: '/PayPair/',
+      vueRouterBase: '/',
       // vueDevtools,
       // vueOptionsAPI: false,
 
