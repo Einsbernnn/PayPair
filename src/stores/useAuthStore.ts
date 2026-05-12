@@ -6,8 +6,11 @@ import {
   signInWithGoogle,
   signInWithGithub,
   signOut,
+  signOutEverywhere,
   signUpWithPassword,
   signInWithPassword,
+  updateProfile,
+  updatePassword,
 } from 'src/services/auth';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -18,7 +21,6 @@ export const useAuthStore = defineStore('auth', () => {
   let initPromise: Promise<void> | null = null;
 
   function init() {
-    // Only run init once; return the same promise if called again
     if (initPromise) return initPromise;
 
     initPromise = new Promise<void>((resolve) => {
@@ -34,7 +36,6 @@ export const useAuthStore = defineStore('auth', () => {
         );
         user.value = session?.user ?? null;
 
-        // INITIAL_SESSION fires after Supabase finishes processing URL tokens
         if (event === 'INITIAL_SESSION') {
           console.log(
             '[AuthStore] INITIAL_SESSION received, user:',
@@ -45,7 +46,6 @@ export const useAuthStore = defineStore('auth', () => {
         }
       });
 
-      // Safety timeout so the app doesn't hang if the event never fires
       setTimeout(() => {
         console.log(
           '[AuthStore] init timeout reached, initialized:',
@@ -107,18 +107,77 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function logoutEverywhere() {
+    loading.value = true;
+    try {
+      await signOutEverywhere();
+      user.value = null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function saveProfile(fullName: string) {
+    loading.value = true;
+    try {
+      const result = await updateProfile(fullName);
+      if (result.user) user.value = result.user;
+      return result;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function changePassword(newPassword: string) {
+    loading.value = true;
+    try {
+      return await updatePassword(newPassword);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   const isLoggedIn = computed(() => !!user.value);
+
+  const fullName = computed(() => {
+    const meta = user.value?.user_metadata as { full_name?: string; name?: string } | undefined;
+    return meta?.full_name ?? meta?.name ?? '';
+  });
+
+  const email = computed(() => user.value?.email ?? '');
+
+  const provider = computed<string>(() => {
+    const app = user.value?.app_metadata as
+      | { provider?: string; providers?: string[] }
+      | undefined;
+    return app?.provider ?? app?.providers?.[0] ?? 'email';
+  });
+
+  const memberSince = computed(() => user.value?.created_at ?? null);
+
+  const isEmailUser = computed(() => {
+    const app = user.value?.app_metadata as { providers?: string[] } | undefined;
+    return (app?.providers ?? []).includes('email');
+  });
 
   return {
     user,
     loading,
     initialized,
     isLoggedIn,
+    fullName,
+    email,
+    provider,
+    memberSince,
+    isEmailUser,
     init,
     loginWithGoogle,
     loginWithGithub,
     registerWithEmail,
     loginWithEmail,
     logout,
+    logoutEverywhere,
+    saveProfile,
+    changePassword,
   };
 });
