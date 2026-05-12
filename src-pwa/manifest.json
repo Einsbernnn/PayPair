@@ -1,7 +1,13 @@
 {
+  "name": "PayPair",
+  "short_name": "PayPair",
+  "description": "Plan shared sessions, split expenses, and settle balances simply.",
+  "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#027be3",
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#F5EFE4",
+  "theme_color": "#F5EFE4",
   "icons": [
     {
       "src": "icons/icon-128x128.png",
@@ -27,6 +33,12 @@
       "src": "icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

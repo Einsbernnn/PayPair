@@ -12,6 +12,8 @@
 
         <q-space />
 
+        <InstallPwaButton />
+
         <q-btn
           v-if="authStore.isLoggedIn"
           flat
@@ -82,6 +84,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import { APP_NAME } from '../constants/app';
   import { useAuthStore } from 'src/stores/useAuthStore';
+  import InstallPwaButton from 'src/components/InstallPwaButton.vue';
 
   const appName = APP_NAME;
   const activeTab = ref('home');
