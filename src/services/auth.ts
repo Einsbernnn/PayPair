@@ -52,3 +52,20 @@ export async function signInWithPassword(email: string, password: string) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function updateProfile(fullName: string) {
+  const { data, error } = await supabase.auth.updateUser({ data: { full_name: fullName } });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function signOutEverywhere() {
+  const { error } = await supabase.auth.signOut({ scope: 'global' });
+  if (error) throw new Error(error.message);
+}

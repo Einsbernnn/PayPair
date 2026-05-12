@@ -96,6 +96,16 @@ export const useSessionStore = defineStore('session', () => {
     sessions.value = sessions.value.filter((s) => s.id !== sessionId);
   }
 
+  async function deleteAllSessions() {
+    const ids = sessions.value.map((s) => s.id);
+    if (ids.length === 0) return 0;
+    await Promise.all(ids.map((id) => sessionService.deleteSession(id)));
+    sessions.value = [];
+    expenses.value = [];
+    splits.value = [];
+    return ids.length;
+  }
+
   async function createUser(name: string): Promise<User> {
     const user = await userService.createUser(name);
     allUsers.value.push(user);
@@ -120,6 +130,7 @@ export const useSessionStore = defineStore('session', () => {
     addParticipant,
     removeParticipant,
     deleteSession,
+    deleteAllSessions,
     createUser,
   };
 });
